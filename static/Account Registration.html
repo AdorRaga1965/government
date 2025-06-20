@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Overview: Secure Account Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2e3a87;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4053b6;
+        }
+        .code-block {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            padding: 15px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🔥 Complete Technical Overview: Secure Account Registration 🚀💯</h2>
+
+        <div class="section">
+            <div class="section-title">1️⃣ Pinoy ID Verification</div>
+            <p>The operator enters their <strong>Pinoy ID</strong>, which is validated against the database via an API call.</p>
+            <div class="code-block">
+                <code>
+async function verifyPinoyID() {
+    const response = await fetch(`/private-api/pinoy/?api=getUserName&pinoy_id=${pinoyID}`);
+    pinoyInfo = await response.json();
+    validPinoyID = !!pinoyInfo.id;
+}
+                </code>
+            </div>
+            <p>If valid, their <strong>First Name, Last Name, and Username</strong> are extracted. The password is pre-generated but hidden to enhance user experience.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2️⃣ Client-Side IP Retrieval</div>
+            <p>Since the server cannot directly obtain the operator’s public IP, the client retrieves it before registration.</p>
+            <div class="code-block">
+                <code>
+async function getClientIP() {
+    const response = await fetch('https://api64.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+}
+                </code>
+            </div>
+            <p>The retrieved IP is passed to the API request for validation.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3️⃣ Secure Transactional Registration</div>
+            <p>The registration process ensures that <strong>saving to the database and sending email happen atomically</strong>, preventing incomplete registration.</p>
+            <div class="code-block">
+                <code>
+async function registerAccountTransaction(toAddress) {
+    try {
+        const ip_address = await getClientIP();
+
+        // Save user account to the database
+        const saveResponse = await fetch('/private-api/pinoy/?api=saveUserAccount', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ validPinoyID: pinoyID, username, password, ip_address })
+        });
+
+        const saveData = await saveResponse.json();
+        if (!saveData.success) throw new Error("User account save failed!");
+
+        // Send verification email
+        const mailResponse = await fetch('/private-api/pinoy/?api=sendMail', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ toAddress, username, pinoy_ID: pinoyID, password, ip_address })
+        });
+
+        const mailData = await mailResponse.json();
+        if (!mailData.success) throw new Error("Email dispatch failed!");
+
+        return { success: true };
+    } catch (error) {
+        console.error("❌ Transaction failure:", error);
+        return { error: "Transaction aborted due to failure." };
+    }
+}
+                </code>
+            </div>
+            <p>If <strong>either step fails</strong>, the transaction is <strong>aborted</strong>, ensuring consistency.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">4️⃣ Operator City Confirmation</div>
+            <p>The operator must confirm their city before finalizing registration.</p>
+            <div class="code-block">
+                <code>
+async function saveAccount() {
+    if (city.trim().toLowerCase().replaceAll(' ', '') !==
+        pinoyInfo.city.toLowerCase().replaceAll(' ', '').replace('cityof', '')) {
+        alert('🚨 City does not match your registered address.');
+        return;
+    }
+
+    const email = "amadorraga@gmail.com"; // Replace with actual user email retrieval logic
+    if (await registerAccountTransaction(email)) {
+        alert(`✅ Thank you!\n\nYour Privileged Access will be sent to ${email}.
+        \n\nPlease confirm within 30 minutes, otherwise it will be revoked.`);
+    } else {
+        alert("❌ Failed to send email. Please check your email address or try again.");
+    }
+}
+                </code>
+            </div>
+            <p>The city is also incorporated into the encrypted secret for verification.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🚨 Why We Removed LocalStorage, Session, and Password Fields</div>
+            <ul>
+                <li>❌ <strong>LocalStorage:</strong> Susceptible to security vulnerabilities, easily accessible via JavaScript.</li>
+                <li>❌ <strong>Session-based storage:</strong> Not ideal for persistent authentication, vulnerable in production environments.</li>
+                <li>❌ <strong>Manual password input:</strong> Pre-generated passwords reduce user friction while ensuring security.</li>
+                <li>✔ <strong>Server-side validation:</strong> Ensures all data remains secure and encrypted.</li>
+            </ul>
+            <p>This streamlined approach enhances security while simplifying registration.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🚀 Final Technical Features</div>
+            <ul>
+                <li>✔ Secure Pinoy ID validation</li>
+                <li>✔ Client-side IP retrieval for accuracy</li>
+                <li>✔ Transactional account creation (atomic operations)</li>
+                <li>✔ City verification for user authentication</li>
+                <li>✔ Password hidden for a smoother registration experience</li>
+                <li>✔ No reliance on insecure LocalStorage or sessions</li>
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+</html>

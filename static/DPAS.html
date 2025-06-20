@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Paper: Dynamic Password Authentication System</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: auto; padding: 20px; }
+        h1, h2, h3 { color: #2E3A87; }
+        .highlight { background: #E3F2FD; padding: 10px; border-radius: 5px; }
+        code { background: #F0F0F0; padding: 5px; border-radius: 3px; display: block; }
+    </style>
+</head>
+<body>
+
+<h1>White Paper: Dynamic Password Authentication System</h1>
+<h2>Introduction</h2>
+<p>
+    Traditional authentication systems store passwords, creating potential security risks.
+    Our approach eliminates permanent password storage while ensuring robust authentication using dynamically generated credentials.
+</p>
+
+<h2>Key Benefits</h2>
+<ul>
+    <li><strong>Eliminates Password Storage:</strong> No credentials remain in the database, reducing breach risks.</li>
+    <li><strong>Location-Based Validation:</strong> Pinoy_ID and Key are pre-verified before authentication.</li>
+    <li><strong>Temporary Password Generation:</strong> Dynamic credentials are valid for 30 minutes, preventing reuse.</li>
+    <li><strong>LocalStorage Authentication:</strong> Credentials are stored client-side, preventing external access.</li>
+</ul>
+
+<h2>Authentication Flow</h2>
+<ol>
+    <li>User enters <strong>Pinoy_ID</strong>.</li>
+    <li>System <strong>validates Pinoy_ID</strong> and retrieves IP Address.</li>
+    <li>Upon successful validation, asks for <strong>Pinoy City</strong> (max 3 attempts).</li>
+    <li>Once verified, requests <strong>Username & Password.</strong></li>
+    <li>User clicks <strong>Register Account</strong> triggering:</li>
+    <ul>
+        <li><strong>Password Encryption:</strong> <code>Encrypt_User_Data(username, password, IP Address)</code></li>
+        <li><strong>Email Notification:</strong>
+            <div class="highlight">
+                Your username is [username], and your password is [password].
+                <br><br>Verification Link: <a href="/verifyaccount?secret=password">Verify Account</a>
+            </div>
+        </li>
+        <li><strong>Password saved in LocalStorage:</strong> Temporary client-side authentication.</li>
+    </ul>
+    <li>User sees a <strong>popup confirmation</strong> requiring email verification within 30 minutes.</li>
+</ol>
+
+<h2>Security Analysis</h2>
+<h3>How This Prevents Hacking Attempts</h3>
+<ul>
+    <li><strong>XSS Attacks:</strong> LocalStorage prevents unauthorized external access.</li>
+    <li><strong>Replay Attacks:</strong> Expiring credentials ensure no long-term reuse.</li>
+    <li><strong>Phishing Protection:</strong> Password is validated against localStorage, preventing outside reuse.</li>
+</ul>
+
+<h2>Implementation Example</h2>
+<code>
+function generatePassword(API, password, username) {
+    return encrypt(username, API.split(".")[2]) + random(9999) + encrypt(password, API.split(".")[3]);
+}
+</code>
+
+<h2>Conclusion</h2>
+<p>
+    This authentication system enhances security by eliminating stored passwords, leveraging dynamic encryption,
+    and enforcing location-based validation—ensuring airtight authentication without increasing friction.
+</p>
+
+</body>
+</html>

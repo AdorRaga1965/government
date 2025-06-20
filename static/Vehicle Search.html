@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Availability Search</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden; /* Ensures rounded corners apply */
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb; /* Light gray border for rows */
+        }
+        th {
+            background-color: #e0e7ff; /* Light blue header */
+            color: #374151; /* Darker text for headers */
+            font-weight: 600;
+            cursor: pointer; /* Indicate sortable columns */
+            position: relative;
+        }
+        th:hover {
+            background-color: #c7d2fe; /* Lighter blue on hover */
+        }
+        th.asc::after {
+            content: ' ▲';
+            font-size: 0.8em;
+            position: absolute;
+            right: 8px;
+        }
+        th.desc::after {
+            content: ' ▼';
+            font-size: 0.8em;
+            position: absolute;
+            right: 8px;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fafb; /* Slightly darker for even rows */
+        }
+        tr:hover {
+            background-color: #eff6ff; /* Lightest blue on row hover */
+        }
+        /* Rounded corners for the table */
+        table thead tr:first-child th:first-child {
+            border-top-left-radius: 8px;
+        }
+        table thead tr:first-child th:last-child {
+            border-top-right-radius: 8px;
+        }
+        table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 8px;
+        }
+        table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 8px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Vehicle Availability Search</h1>
+
+        <!-- Search Controls -->
+        <div class="flex flex-col md:flex-row gap-4 mb-6 items-end">
+            <div class="flex-1 w-full">
+                <label for="searchType" class="block text-sm font-medium text-gray-700 mb-1">Search Type:</label>
+                <select id="searchType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm">
+                    <option value="make">Make</option>
+                    <option value="model">Model</option>
+                    <option value="country">Country</option>
+                    <option value="year">Year</option>
+                    <option value="vin">VIN</option>
+                </select>
+            </div>
+            <div class="flex-1 w-full">
+                <label for="searchText" class="block text-sm font-medium text-gray-700 mb-1">Search Term:</label>
+                <input type="text" id="searchText" placeholder="Enter search term..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+            </div>
+            <button id="searchButton" class="w-full md:w-auto px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                Search
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden text-center text-blue-600 font-semibold mb-4">
+            Loading data... Please wait.
+        </div>
+
+        <!-- Filter for results table -->
+        <div class="mb-4">
+            <label for="tableFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter Results:</label>
+            <input type="text" id="tableFilter" placeholder="Filter table results..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5">
+        </div>
+
+        <!-- Results Table Container -->
+        <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+            <table id="resultsTable" class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th data-column="VIN" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">VIN</th>
+                        <th data-column="year" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                        <th data-column="country" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                        <th data-column="model" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                        <th data-column="make" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Make</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No results found. Try a search!</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div id="customAlertModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Alert</h3>
+                <p id="customAlertMessage" class="text-gray-700 mb-6"></p>
+                <button id="customAlertClose" class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchType = document.getElementById('searchType');
+        const searchText = document.getElementById('searchText');
+        const searchButton = document.getElementById('searchButton');
+        const tableBody = document.getElementById('tableBody');
+        const resultsTable = document.getElementById('resultsTable');
+        const tableFilterInput = document.getElementById('tableFilter');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        // Custom alert elements
+        const customAlertModal = document.getElementById('customAlertModal');
+        const customAlertMessage = document.getElementById('customAlertMessage');
+        const customAlertClose = document.getElementById('customAlertClose');
+
+        let currentData = []; // Store the fetched data for sorting and filtering
+
+        // Function to show custom alert
+        function showAlert(message) {
+            customAlertMessage.textContent = message;
+            customAlertModal.classList.remove('hidden');
+        }
+
+        // Event listener for custom alert close button
+        customAlertClose.addEventListener('click', () => {
+            customAlertModal.classList.add('hidden');
+        });
+
+
+        // Function to render table rows
+        function renderTable(data) {
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No results found.</td></tr>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.VIN}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.year}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.country}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.model}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.make}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // --- Sorting Logic ---
+        let sortColumn = null;
+        let sortDirection = 'asc'; // 'asc' or 'desc'
+
+        resultsTable.querySelectorAll('th').forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.dataset.column;
+
+                // Reset all headers
+                resultsTable.querySelectorAll('th').forEach(h => {
+                    h.classList.remove('asc', 'desc');
+                });
+
+                if (sortColumn === column) {
+                    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortColumn = column;
+                    sortDirection = 'asc';
+                }
+
+                header.classList.add(sortDirection);
+
+                sortData(currentData, sortColumn, sortDirection);
+                renderTable(currentData);
+            });
+        });
+
+        function sortData(data, column, direction) {
+            data.sort((a, b) => {
+                const valA = a[column];
+                const valB = b[column];
+
+                if (typeof valA === 'string' && typeof valB === 'string') {
+                    return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    // For numbers or other comparable types
+                    if (valA < valB) return direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return direction === 'asc' ? 1 : -1;
+                    return 0;
+                }
+            });
+        }
+
+        // --- Filtering Logic for the displayed table ---
+        tableFilterInput.addEventListener('input', () => {
+            const filterText = tableFilterInput.value.toLowerCase();
+            const filteredData = currentData.filter(item => {
+                // Check if any column value contains the filter text
+                return Object.values(item).some(value =>
+                    String(value).toLowerCase().includes(filterText)
+                );
+            });
+            renderTable(filteredData);
+        });
+
+
+        // --- Search Button Click Handler ---
+        searchButton.addEventListener('click', async () => {
+            const selectedType = searchType.value;
+            const searchTerm = searchText.value.trim();
+
+            loadingIndicator.classList.remove('hidden'); // Show loading indicator
+            tableBody.innerHTML = ''; // Clear table while loading
+
+            try {
+                // Construct the prompt for the LLM based on your SQL function signature
+                const prompt = `Simulate the execution of the PostgreSQL function VEHICLES.FN_AVAILABLEVIN with parameters search='${searchTerm}' and type='${selectedType}'. Return the results as a JSON array of objects, where each object has VIN (TEXT), year (INTEGER), country (TEXT), model (TEXT), and make (TEXT). Ensure the data is realistic for vehicle information. Provide at least 5 results if possible, or fewer if the search criteria narrow it down. If no results match, return an empty array.
+
+                Example structure for one result:
+                {
+                  "VIN": "ABC123XYZ45678901",
+                  "year": 2023,
+                  "country": "Germany",
+                  "model": "X5",
+                  "make": "BMW"
+                }`;
+
+                // LLM API call
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+                const payload = {
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "application/json", // Request JSON output
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    "VIN": { "type": "STRING" },
+                                    "year": { "type": "INTEGER" },
+                                    "country": { "type": "STRING" },
+                                    "model": { "type": "STRING" },
+                                    "make": { "type": "STRING" }
+                                },
+                                "propertyOrdering": ["VIN", "year", "country", "model", "make"]
+                            }
+                        }
+                    }
+                };
+
+                const apiKey = ""; // Canvas will automatically provide this
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    currentData = JSON.parse(jsonString); // Store parsed data
+                    renderTable(currentData); // Render initial data
+                } else {
+                    showAlert('Error: No valid data received from the API.');
+                    currentData = []; // Clear data on error
+                    renderTable([]);
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showAlert(`Failed to fetch data: ${error.message}. Please try again.`);
+                currentData = []; // Clear data on error
+                renderTable([]);
+            } finally {
+                loadingIndicator.classList.add('hidden'); // Hide loading indicator
+            }
+        });
+    </script>
+</body>
+</html>

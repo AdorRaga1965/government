@@ -1,0 +1,154 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+@plugin '@tailwindcss/forms';
+@plugin "daisyui";
+
+
+body {
+    @apply bg-base-200 text-base-content;
+}
+
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Custom Fonts */
+@font-face {
+    font-family: 'monoton';
+    src: url('/fonts/Monoton-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'spice';
+    src: url('/fonts/BungeeSpice-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'almendra';
+    src: url('/fonts/Kenney Rocket Square.ttf') format('truetype');
+}
+
+
+label {
+    @apply text-white font-bold mb-2;
+}
+
+
+/* Cards */
+.card-container {
+    @apply  min-h-screen bg-gradient-to-r from-blue-900 to-blue-500 text-white;
+}
+
+.section {
+    @apply shadow-lg rounded-xl p-2 max-w-[600px] hover:bg-blue-700 transition-shadow duration-300;
+}
+/* Section Titles */
+.section-title {
+    text-shadow: 2px 2px 4px cornflowerblue;
+    @apply text-4xl text-zinc-200 font-bold mb-2;
+}
+
+.section-container {
+    @apply flex flex-col h-full p-2 w-fit;
+}
+
+/* Text Styling */
+.text-content {
+    @apply text-gray-700 mb-4 leading-relaxed;
+}
+
+/*!* Input & Focus Enhancements *!*/
+/*.input {*/
+/*    @apply p-2 border border-gray-300 rounded-md text-zinc-800 transition*/
+/*    focus:outline-6 focus:ring-4 focus:h-14 focus:ring-amber-400 focus:text-zinc-800;*/
+/*}*/
+
+.field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+label {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.input {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
+    /*background: white;*/
+    color: white;
+}
+
+.input:focus {
+    outline: none;
+    color: green ;
+    font-weight:900;
+    border-color: #2E3A87;
+    background: linen;
+}
+
+/* Dropdown Components */
+.dropdown-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.dropdown-overlay {
+    @apply absolute z-50 top-full left-0 bg-teal-50 shadow-md rounded-md w-full mt-1;
+}
+
+.dropdown-content {
+    @apply z-40 p-1 my-0 text-sm text-zinc-800 shadow bg-teal-100 rounded-sm w-full;
+}
+
+/* Fields */
+.field {
+    @apply flex flex-col mb-4 text-zinc-900;
+}
+
+label {
+    @apply mb-2 font-bold;
+}
+
+.shady {
+    @apply text-shadow-lg text-rose-400 text-shadow-zinc-700;
+}
+
+.card {
+    @apply mx-4 px-2 rounded-lg shadow-md bg-transparent;
+}
+
+.section {
+    @apply text-3xl text-shadow-lg  p-1 bg-rose-50 hover:bg-transparent
+
+    text-shadow-zinc-500 font-bold text-zinc-300 justify-center mt-4 text-center;
+}
+
+/* 🚀 Global container styling */
+.container {
+    color: black; /* ✅ Maintains readability across themes */
+    border-radius: 8px; /* ✅ Smooth rounded edges */
+    max-width: 800px;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 40px 60px;
+    margin: 30px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-top: 5px solid #003366; /* A formal, presidential blue */
+}
+
+
+.stick {
+    @apply sticky top-0 z-50 bg-white shadow-md;
+}

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>National ID System</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: black;
+      background-image: url('img/happy.gif');
+      background-repeat: no-repeat;
+      background-size: cover; /* or use 'contain' or specific dimensions */
+      background-position: center;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      position: relative;
+    }
+
+    @keyframes rotatePlanet {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .globe {
+      width: 480px;
+      height: 480px;
+      background-image: url('img/earth.gif');
+      border-radius: 50%;
+      position: absolute;
+      bottom: -240px;
+      z-index: 1;
+      /*box-shadow: inset -20px -20px 30px rgba(0,0,0,0.5), inset 10px 10px 20px rgba(255,255,255,0.1), 0 0 30px rgba(0, 200, 255, 0.3);*/
+      /*animation: rotatePlanet 30s linear infinite;*/
+    }
+
+    .orbit-container {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .planet {
+      width: 60px;
+      height: 61px;
+      background: transparent;
+      border-radius: 50%;
+      position: absolute;
+      /*box-shadow: inset -12px -12px 20px rgba(0,0,0,0.6), inset 10px 10px 15px rgba(255,255,255,0.2), 0 0 10px rgba(255, 255, 255, 0.1);*/
+      /*transition: transform 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;*/
+      z-index: 2;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      perspective: 1000px;
+    }
+
+    ul {
+      max-width: 500px;
+    }
+
+    .planet::before {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-image: url('img/earthly.png');
+
+
+
+      /*animation: none;*/
+    }
+
+    .planet.hovered::before {
+      animation: rotatePlanet 6s linear infinite;
+    }
+
+    .planet.active {
+      transform: scale(1.7);
+      background: radial-gradient(circle at 30% 30%, #4f4, #2a2);
+      box-shadow: 0 0 25px #4f4, inset -10px -10px 20px rgba(0,0,0,0.5), inset 8px 8px 15px rgba(255,255,255,0.2);
+      z-index: 3;
+      animation: rotatePlanet 2s linear infinite;
+
+    }
+
+.panel {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 400px);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 6px;
+  font-size: 16px;
+  z-index: 4;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  pointer-events: auto; /* Allow interaction */
+}
+
+	li {
+		margin-bottom: 8px;
+		padding-left: 0;
+	}
+
+
+.panel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+h2 {
+  font-size: 22px;
+  color: green;
+  font-weight: 990;
+  margin-bottom: 12px;
+
+}
+
+
+    svg {
+      position: absolute;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    textPath {
+      dominant-baseline: middle;
+      text-anchor: middle;
+      fill: yellowgreen;
+
+      font-size: 12px;
+      font-family: sans-serif;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="globe" id="globe"></div>
+  <div class="orbit-container" id="orbit"></div>
+  <div class="panel" id="panel">
+  </div>
+
+  <script lang="ts">
+    const orbit = document.getElementById('orbit');
+    const globe = document.getElementById('globe');
+    const panel = document.getElementById('panel1');
+    const radius = 300;
+    const planetLabels = [
+      "Local",
+      "Transportation",
+      "Health",
+      "Education",
+      "Statistics",
+      "Immigration",
+      "Labor"
+    ];
+    const planetCount = planetLabels.length;
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight;
+
+    for (let i = 0; i < planetCount; i++) {
+      const angleOffset = Math.PI / 2 - Math.PI * (150 / 360);
+      const angle = angleOffset + (Math.PI * 150 / 180) * (i / (planetCount - 1));
+
+      const planet = document.createElement('div');
+      planet.className = 'planet';
+      const x = centerX + radius * Math.cos(angle) - 40;
+      const y = centerY - radius * Math.sin(angle) - 40;
+      planet.style.left = `${x}px`;
+      planet.style.top = `${y}px`;
+
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("width", 60);
+      svg.setAttribute("height", 30);
+      svg.style.position = 'absolute';
+      svg.style.left = `${x - 40}px`;
+      svg.style.top = `${y + 44}px`; // 4px above the planet
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("id", `circlePath${i}`);
+      path.setAttribute("d", "M2,20 A70,70 0 0,1 150,20");
+      path.setAttribute("fill", "none");
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      const textPath = document.createElementNS("http://www.w3.org/2000/svg", "textPath");
+      textPath.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `#circlePath${i}`);
+      textPath.setAttribute("startOffset", "48%");
+      textPath.setAttribute("text-anchor", "middle");
+      textPath.textContent = planetLabels[i];
+      text.appendChild(textPath);
+
+      svg.appendChild(path);
+      svg.appendChild(text);
+
+      orbit.appendChild(svg);
+      orbit.appendChild(planet);
+
+      planet.addEventListener('mouseenter', () => {
+        planet.classList.add('hovered');
+        loadContent(planetLabels[i]);
+      });
+
+      planet.addEventListener('mouseleave', () => {
+        planet.classList.remove('hovered');
+      });
+
+      planet.addEventListener('click', () => {
+        document.querySelectorAll('.planet').forEach(p => p.classList.remove('active'));
+        planet.classList.add('active');
+        // document.getElementById('deptFrame').src =  "/pinoy" ;// planetLabels[i].toLowerCase();
+        // showPanel(2)
+      });
+
+
+  function loadContent(filePath) {
+    let panel=document.getElementById('panel');
+    fetch("government/" + filePath.toLowerCase() + ".html")
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.text();
+      })
+      .then(html => {
+        panel.innerHTML = html;
+      })
+      .catch(err => {
+        panel.innerHTML = `<p>Error loading content: ${err.message}</p>`;
+      });
+  }
+
+  loadContent("prologue")
+
+
+    }
+  </script>
+</body>
+</html>

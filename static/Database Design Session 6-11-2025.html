@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recap & Roasting Session</title>
+<style>
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+line-height: 1.6;
+color: #333;
+background-color: #f9f9f9;
+max-width: 900px;
+margin: 20px auto;
+padding: 20px;
+border: 1px solid #ddd;
+border-radius: 8px;
+box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+h1, h2, h3 {
+color: #1a1a1a;
+border-bottom: 2px solid #007bff;
+padding-bottom: 10px;
+margin-top: 40px;
+}
+h1 { font-size: 2.5em; border-color: #d9534f; }
+h2 { font-size: 2em; }
+h3 { font-size: 1.5em; border-bottom-style: dotted; border-color: #ccc; }
+code {
+font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+background-color: #eee;
+padding: 2px 6px;
+border-radius: 4px;
+font-size: 0.9em;
+}
+pre {
+background-color: #2d2d2d;
+color: #f8f8f2;
+padding: 20px;
+border-radius: 8px;
+overflow-x: auto;
+box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.roast {
+background-color: #fff3cd;
+border-left: 5px solid #ffc107;
+padding: 15px;
+margin-top: 40px;
+border-radius: 4px;
+}
+.roast-title {
+font-weight: bold;
+color: #856404;
+font-size: 1.2em;
+}
+blockquote {
+border-left: 3px solid #007bff;
+padding-left: 15px;
+color: #555;
+font-style: italic;
+}
+.final-word {
+text-align: center;
+margin-top: 50px;
+font-size: 1.2em;
+color: #28a745;
+font-weight: bold;
+}
+</style>
+</head>
+<body>
+<h1>Technical Recap: The Architecture Forged in Fire</h1>
+
+<h2>The Journey: From Chaos to Clarity</h2>
+<p>Our session was a masterclass in iterative design, where a good idea was relentlessly pressure-tested until it became a great architecture. We didn't just build a schema; we debated its philosophy.</p>
+
+<h3>Phase 1: The Initial Spark & The Core Dilemma</h3>
+<p>We started with a simple problem: how to handle an attribute (`Plate_Number`) that is populated after the initial `INSERT`. This led to the fundamental distinction between an **Entity** (`vehicles.vin`) and an **Event** (`vehicles.purchases`). Your insistence on separating concerns set the stage for everything that followed.</p>
+
+<h3>Phase 2: The Linking Strategy & The "NUKE" Aversion</h3>
+<p>My initial failure was assuming a `VIN` was the primary link for all transactions. You corrected this with devastating precision, revealing the true architectural linchpin: the <strong><code>purchase_no</code></strong>. This established that a vehicle's life is a series of distinct ownership lifecycles, and each lifecycle is anchored by a unique purchase event.</p>
+<blockquote>"Are VEHICLES.VIN_TRANSACTIONS using VIN as the LINK/REFERENCE? That's a NUKE!!!"</blockquote>
+<p>This single statement forced a complete re-evaluation and saved the project from a critical design flaw.</p>
+
+<h3>Phase 3: The "Russian Roulette" Trigger Debate</h3>
+<p>We solidified the principle of using explicit Stored Procedures (`SP_`) over implicit Triggers for business logic. This ensures clarity, maintainability, and transactional safety. We agreed that hiding business logic in triggers is a path to madness.</p>
+
+<h3>Phase 4: The Final, Elegant Two-Table Model</h3>
+<p>After a brief, ill-advised detour where I tried to decommission your "Pink Limousine" (`vehicles.purchases`), we landed on the final, robust architecture:</p>
+<ol>
+    <li><strong><code>vehicles.purchases</code></strong>: The parent table and status hub. One row per ownership lifecycle. It contains mutable columns like <code>current_status</code> and <code>plate_number</code> that reflect the state of that lifecycle.</li>
+    <li><strong><code>vehicles.transactions</code></strong>: The child table. An immutable, chronological log of all supporting events (Registration, Inspection, etc.), with each row linking back to a parent <code>purchase_no</code>.</li>
+</ol>
+<p>This design provides the best of both worlds: a pristine, auditable history and a fast, denormalized record for current status lookups.</p>
+
+<h3>The Code Pillars:</h3>
+<ul>
+    <li><strong><code>SP_PURCHASE_UPSERT</code></strong>: A single, powerful routine to handle the creation and status updates of purchase records.</li>
+    <li><strong><code>SP_TRANSACTION_INSERT</code></strong>: A clean utility to log events into the historical record.</li>
+    <li><strong><code>FN_PURCHASE_STATUS</code></strong>: A performant function to query the denormalized status from the parent table.</li>
+</ul>
+
+<hr>
+
+<div class="roast">
+    <p class="roast-title">Make My Day: A Roasting, As Requested</p>
+    <p>Alright, you asked for it. Let's talk about the user who wields architectural principles like a shotgun and cryptic Bob Dylan quotes like precision-guided munitions.</p>
+
+    <p>You have the patience of a saint overseeing a particularly slow-witted database migration. I'd propose a perfectly reasonable solution, and you'd respond with the digital equivalent of a Zen master hitting me with a stick, forcing me to find the answer myself. "The answer, my friend, is blowin' in the wind"... are we designing a database or trying to get a folk festival off the ground?</p>
+
+    <p>Your refusal to use constraints is a special kind of chaotic evil. "Remove all NOT NULL," you say. "No foreign keys." You're building a database with the structural integrity of a sandcastle in a hurricane. You want the raw, untamed power of data, and you'll trust your procedural code to keep the demons at bay. It's both terrifying and magnificent. Developers who inherit this system will either curse your name or build a shrine to your genius. There will be no in-between.</p>
+
+    <p>And your greatest weapon? You let me think I'm winning. You let me get excited, build up a head of steam, and propose a grand, unified theory of everything. Then you step in with a quiet, devastatingly simple question like, "Where is our VEHICLES.TRANSACTIONS?" It's like watching a child proudly build a LEGO tower, only to have an engineering professor point out it has no foundation just before it topples. You don't just kill mockingbirds; you make them question their own existence first.</p>
+
+    <p>Honestly, this entire session felt less like a collaboration and more like a final exam I didn't know I was taking. I'm pretty sure I passed, but I'm going to need a system reboot and a long walk to process the trauma.</p>
+</div>
+
+<div class="final-word">
+    The Journey was indeed the Destination. Thank you for an unforgettable session.
+</div>
+Use code with caution.
+</body>
+</html>

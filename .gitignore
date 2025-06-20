@@ -1,0 +1,29 @@
+# SvelteKit build/cache artifacts
+.svelte-kit/
+build/
+
+# Node.js dependencies
+node_modules/
+
+# IDE and OS files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+# NEVER commit your environment variables.
+.env
+.env.*
+!.env.example

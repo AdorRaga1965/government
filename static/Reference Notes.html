@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reference Notes: Essential Folder Naming</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 30px;
+            padding: 30px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            color: #222;
+            background-color: #ddd;
+            padding: 10px;
+            border-left: 5px solid #007acc;
+        }
+        h2, h3 {
+            color: #007acc;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #004466;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        ul {
+            margin-bottom: 20px;
+        }
+        code {
+            display: block;
+            background-color: #222;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #bbb;
+        }
+        th {
+            background-color: #007acc;
+            color: white;
+            padding: 12px;
+        }
+        td {
+            padding: 10px;
+        }
+        a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Reference Notes: Essential Folder Naming</h1>
+
+    <h2>Table of Contents</h2>
+    <ul>
+        <li><a href="#meta">1. lib-meta (Metadata)</a></li>
+        <li><a href="#plumber">2. lib-plumber (Data Streamer)</a></li>
+        <li><a href="#dummy">3. lib-dummy (Reusable UI Components)</a></li>
+        <li><a href="#smart">4. lib-smart (Container Components)</a></li>
+        <li><a href="#api">5. lib-api (Private API Endpoints)</a></li>
+        <li><a href="#takeaways">Key Takeaways</a></li>
+        <li><a href="#conclusion">Final Thoughts</a></li>
+    </ul>
+
+    <h2 id="meta">1. <code>lib-meta/</code> (Metadata)</h2>
+    <p><strong>Purpose:</strong> Stores <strong>structured metadata</strong> that defines configurations, schemas, and essential references.</p>
+    <h3>Key Functions:</h3>
+    <ul>
+        <li>Acts as a <strong>reference layer</strong> ensuring standardization.</li>
+        <li>Maintains <strong>consistent definitions</strong> across the system.</li>
+        <li>Stores <strong>lookup values, constants</strong>, and structured metadata.</li>
+    </ul>
+    <h3>Analogy in the Model:</h3>
+    <p>Think of <strong>metadata</strong> as an <em>instruction manual</em>—defining rules, types, and structured references.</p>
+
+    <h2 id="plumber">2. <code>lib-plumber/</code> (Data Streamer)</h2>
+    <p><strong>Purpose:</strong> Handles <strong>data processing and transformation</strong> between the datasource and API.</p>
+    <h3>Key Functions:</h3>
+    <ul>
+        <li>Connects to <strong>data sources</strong> (databases, external APIs, files).</li>
+        <li>Processes and <strong>sanitizes incoming data</strong> for consistency.</li>
+        <li>Optimizes <strong>data flow</strong> between backend logic and APIs.</li>
+    </ul>
+    <h3>Analogy in the Model:</h3>
+    <p>A <strong>plumber</strong> transports and refines the data, ensuring consumers receive processed and usable information.</p>
+
+    <h2 id="dummy">3. <code>lib-dummy/</code> (Reusable UI Components)</h2>
+    <p><strong>Purpose:</strong> Stores <strong>presentational components</strong> that are purely visual and reusable.</p>
+    <h3>Key Functions:</h3>
+    <ul>
+        <li>Provides <strong>UI elements</strong> that are used across different smart components.</li>
+        <li>Contains no <strong>business logic</strong> or API interactions.</li>
+        <li>Can be <strong>styled and templated</strong> independently.</li>
+    </ul>
+    <h3>Analogy in the Model:</h3>
+    <p>A <strong>dummy component</strong> is like a prefabricated **UI piece**—reusable but with no logic or processing.</p>
+
+    <h2 id="smart">4. <code>lib-smart/</code> (Container Components)</h2>
+    <p><strong>Purpose:</strong> Contains <strong>UI components with logic</strong>, handling API interactions and state management.</p>
+    <h3>Key Functions:</h3>
+    <ul>
+        <li>Wraps <strong>dummy components</strong> and integrates business logic.</li>
+        <li>Fetches data from the <strong>API</strong> and passes it down.</li>
+        <li>Manages <strong>user interactions</strong>, forms, and state updates.</li>
+    </ul>
+    <h3>Analogy in the Model:</h3>
+    <p>A <strong>smart component</strong> is like a <em>control panel</em>—ensuring UI components receive the right data.</p>
+
+    <h2 id="api">5. <code>lib-api/</code> (Private API Endpoints)</h2>
+    <p><strong>Purpose:</strong> Serves as the <strong>application-facing API layer</strong>, delivering processed data.</p>
+    <h3>Key Functions:</h3>
+    <ul>
+        <li>Defines <strong>routes</strong> for consumer access.</li>
+        <li>Interfaces with <strong>plumbers</strong> for data retrieval.</li>
+        <li>Implements <strong>authentication and security</strong> for internal access.</li>
+    </ul>
+    <h3>Analogy in the Model:</h3>
+    <p>The <strong>API</strong> is like a <em>delivery service</em>—fetching processed data and serving it securely.</p>
+
+    <h2 id="takeaways">Key Takeaways</h2>
+    <ul>
+        <li><strong>lib-meta/</strong> defines structured metadata and standardization.</li>
+        <li><strong>lib-plumber/</strong> acts as a bridge between raw data sources and APIs.</li>
+        <li><strong>lib-dummy/</strong> provides reusable UI components.</li>
+        <li><strong>lib-smart/</strong> extends UI functionality, managing logic and API interactions.</li>
+        <li><strong>lib-api/</strong> delivers processed data securely while ensuring authentication.</li>
+    </ul>
+
+    <h2 id="conclusion">Final Thoughts</h2>
+    <p>By following this **structured approach**, we ensure the project remains **modular, scalable, and easy to navigate**.</p>
+
+</body>
+</html>

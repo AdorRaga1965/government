@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Transaction Simulation - Analysis & Refinements</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        h1, h2 { color: #003366; }
+        code { background: #f4f4f4; padding: 5px; border-radius: 5px; display: block; }
+        .highlight { background: #ffffcc; padding: 10px; border-left: 5px solid #ff9900; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #003366; color: white; }
+    </style>
+</head>
+<body>
+
+<h1>🚀 SQL Transaction Simulation - Analysis & Refinements</h1>
+
+<h2>🔍 1. Overview of Transaction Simulation</h2>
+<p>This simulation aimed to replicate real-world **vehicle transactions**, ensuring:</p>
+<ul>
+    <li>🔹 Structured ownership transfers (Purchase ➝ DOS ➝ Registration).</li>
+    <li>🔹 Officer assignments for notarization, clearance, insurance.</li>
+    <li>🔹 Realistic activation dates for transaction processing.</li>
+    <li>🔹 Adaptive probability models ensuring **balanced turnover rates**.</li>
+</ul>
+
+<h2>⚡ 2. Cursor Movement: Structured Iteration & Flow</h2>
+<p>The SQL loop **moves the cursor forward** to simulate transaction progress dynamically.</p>
+
+<code>
+DO $$
+DECLARE transaction_time TIMESTAMP := CURRENT_TIMESTAMP - INTERVAL '2.45 years';
+BEGIN
+    WHILE transaction_time <= CURRENT_TIMESTAMP - INTERVAL '2.1 years' LOOP
+        -- Cursor moves forward by 5 minutes instead of 30 seconds
+        transaction_time := transaction_time + INTERVAL '5 minutes';
+    END LOOP;
+END $$;
+</code>
+
+<p><strong>🔹 Why This Matters:</strong></p>
+<ul>
+    <li>🚀 Ensures steady transaction flow with **realistic intervals** (adjusting from 30s to 5m).</li>
+    <li>🚗 Prevents excessive turnover of ownership (avoiding unrealistic rapid sales).</li>
+</ul>
+
+<h2>🎯 3. Probability Assignment: Realistic Resale Patterns</h2>
+<p>Initially, transactions occurred **20% of the time** (`IF RANDOM() < 0.2`). After analysis, we adjusted:</p>
+
+<code>
+IF RANDOM() < (
+    SELECT AVG(Resale_Rate) FROM (
+        SELECT Model_Name, DOS_Count / Purchase_Count AS Resale_Rate
+        FROM Vehicles.Vehicle_Model_Stats
+    )
+) THEN
+</code>
+
+<p><strong>🔹 Why This Matters:</strong></p>
+<ul>
+    <li>📊 Uses **historical resale patterns** to dictate turnover probability.</li>
+    <li>📉 Avoids excessive DOS transactions for models with naturally lower resale demand.</li>
+</ul>
+
+<h2>⏳ 4. Timing Adjustments: Real-World Purchasing Behavior</h2>
+<p>Vehicle purchases in the Philippines don’t happen **every 30 seconds**, so we revised the interval:</p>
+
+<code>
+transaction_time := transaction_time + INTERVAL '2 hours';
+</code>
+
+<p><strong>🔹 Why This Matters:</strong></p>
+<ul>
+    <li>🌐 Simulates natural market behavior (daily purchasing trends).</li>
+    <li>🚗 Prevents exaggerated resale patterns.</li>
+</ul>
+
+<h2>🔎 5. Queried Matrices: What We Validated</h2>
+
+<p>We executed structured queries to validate simulation integrity:</p>
+
+<table>
+    <tr>
+        <th>Query Purpose</th>
+        <th>SQL Example</th>
+    </tr>
+    <tr>
+        <td>🔹 Count Notarized Vehicles Per Officer</td>
+        <td><code>
+SELECT pi.Full_Name, COUNT(vt.VIN) AS Notarized_Vehicles
+FROM Vehicles.Vehicle_Transactions vt
+JOIN Public.Pinoy_Info pi ON vt.Pinoy_ID = pi.Pinoy_ID
+WHERE vt.Transaction_Type = 'DOS'
+GROUP BY pi.Full_Name;
+        </code></td>
+    </tr>
+    <tr>
+        <td>🔹 Identify Vehicles with 3+ Owners</td>
+        <td><code>
+SELECT v.VIN, mo.Model_Name, COUNT(vt.VIN) AS Ownership_Count
+FROM Vehicles.Vehicle_Transactions vt
+JOIN Vehicles.Pinoy_Vehicles_Vin v ON vt.VIN = v.vin_number
+JOIN Vehicles.Vehicle_Model mo ON v.vehicle_model_id = mo.model_id
+WHERE vt.Transaction_Type IN ('Purchase', 'DOS')
+GROUP BY v.VIN, mo.Model_Name
+HAVING COUNT(vt.VIN) >= 3;
+        </code></td>
+    </tr>
+</table>
+
+<h2>🚀 6. Future Refinements for Realism</h2>
+<p>While this model is strong, our next phase will focus on:</p>
+<ul>
+    <li>📊 **Market-Based DOS Simulation:** Adjust ownership change rates based on model demand.</li>
+    <li>⏳ **Minimum Ownership Duration Enforcement:** Prevent immediate resales.</li>
+    <li>🔍 **Edge Case Analysis:** Detect anomalies in turnover rates.</li>
+</ul>
+
+<h3>✅ Refinement: Minimum Ownership Time Constraint</h3>
+<code>
+SELECT * FROM Vehicles.Vehicle_Transactions vt
+WHERE vt.Transaction_Type = 'DOS'
+AND EXISTS (SELECT 1 FROM Vehicles.Vehicle_Transactions p WHERE p.VIN = vt.VIN AND p.Transaction_Date <= vt.Transaction_Date - INTERVAL '6 months');
+</code>
+
+<h3>💡 Adaptive DOS Probability Based on Model Trends</h3>
+<code>
+SELECT Model_Name, AVG(DOS_Count / Purchase_Count) AS Resale_Rate
+FROM (
+    SELECT vt.Transaction_Type, vt.VIN, mo.Model_Name,
+           COUNT(CASE WHEN vt.Transaction_Type = 'Purchase' THEN 1 END) AS Purchase_Count,
+           COUNT(CASE WHEN vt.Transaction_Type = 'DOS' THEN 1 END) AS DOS_Count
+    FROM Vehicles.Vehicle_Transactions vt
+    JOIN Vehicles.Pinoy_Vehicles_Vin v ON vt.VIN = v.vin_number
+    JOIN Vehicles.Vehicle_Model mo ON v.vehicle_model_id = mo.model_id
+    GROUP BY vt.VIN, mo.Model_Name
+) AS ModelStats
+GROUP BY Model_Name
+ORDER BY Resale_Rate DESC;
+</code>
+
+<h2>🏆 Conclusion: Next Steps for Simulation Excellence</h2>
+<p>We have successfully built an adaptive, structured, and scalable transaction workflow—but we **never stop refining** for realism. Our next step? **Tighter validation, ownership duration constraints, and fraud prevention mechanisms.** 🚀</p>
+
+</body>
+</html>

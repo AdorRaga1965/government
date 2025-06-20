@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering Vehicle Transactions: A Hierarchical Data Journey</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.8em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            font-size: 1.4em;
+            margin-top: 20px;
+            color: #34495e;
+        }
+        strong {
+            color: #e74c3c;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .date {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        .highlight {
+            background-color: #ecf0f1;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mastering Vehicle Transactions: A Hierarchical Data Journey</h1>
+        <p class="date">Documentation Date: June 2, 2025</p>
+
+        <p>
+            This document consolidates the meticulous methodology employed to build a robust and logically sound vehicle transaction history within the <span class="highlight">VEHICLES.TRANSACTIONS</span> table. Our approach was guided by a strict hierarchy and precise rules for each transaction type, ensuring a clean, validated dataset ready for consolidated status views.
+        </p>
+
+        <h2>Core Principles: The Pillars of Our Data Integrity</h2>
+        <p>At the heart of our methodology lay two fundamental principles that governed every step of data generation and validation:</p>
+        <ul>
+            <li>
+                <strong>The "Latest Transaction is King"</strong>: For any given vehicle, its current status and eligibility for the next hierarchical step are determined solely by its <strong>absolute most recent transaction</strong>. We consistently prioritized the <span class="highlight">rn=1</span> (latest by date) transaction for each VIN to ascertain its current standing. This avoids ambiguity and ensures a clear, sequential progression through the vehicle's lifecycle.
+            </li>
+            <li>
+                <strong>A Transaction Defines Current Ownership</strong>: A transaction is considered <strong>distinct based on the unique combination of <span class="highlight">VIN</span> and <span class="highlight">PINOY_NATIONAL_ID</span></strong>. This specific pairing uniquely identifies the <span class="highlight">CURRENT OWNERSHIP</span> of the vehicle at the time of that transaction. This is crucial because a vehicle's journey might involve multiple owners, and each <span class="highlight">Purchase</span> transaction with a new <span class="highlight">PINOY_NATIONAL_ID</span> effectively initiates a new ownership chain, "resetting" the vehicle's hierarchical progression under that new owner.
+            </li>
+        </ul>
+
+        <h2>Hierarchical Steps: Navigating the Vehicle's Lifecycle</h2>
+        <p>The following outlines the logical, hierarchical steps taken, detailing the rules and roles governing each <span class="highlight">TRANSACTION_TYPE</span>:</p>
+
+        <h3>Phase 1: The Foundation - <span class="highlight">PURCHASE</span></h3>
+        <ul>
+            <li><strong>Role in Hierarchy:</strong> This is the foundational transaction type; every vehicle's journey begins here.</li>
+            <li><strong>Rule:</strong> There are no preceding transaction requirements for a <span class="highlight">PURCHASE</span>. It marks the initial acquisition of a vehicle by an owner.</li>
+            <li><strong>Focus on "Last Transaction":</strong> While <span class="highlight">Purchase</span> doesn't have a predecessor rule, it establishes the <span class="highlight">PINOY_NATIONAL_ID</span> (owner) that subsequent transactions will follow. Later <span class="highlight">Deed Of Sale</span> transactions will look for the *latest* <span class="highlight">Purchase</span> for a given VIN.</li>
+            <li><strong>Associated Role:</strong> No specific officer role is typically associated directly with the <span class="highlight">Purchase</span> transaction itself in this context.</li>
+        </ul>
+
+        <h3>Phase 2: Transfer of Legal Ownership - <span class="highlight">DEED OF SALE</span></h3>
+        <ul>
+            <li><strong>Role in Hierarchy:</strong> Represents the legal transfer of ownership after a <span class="highlight">Purchase</span>.</li>
+            <li><strong>Rule:</strong> "You cannot have <span class="highlight">DEED OF SALE</span> unless the <strong>last</strong> was <span class="highlight">PURCHASE</span>."
+                <ul>
+                    <li><strong>Why "Last Transaction":</strong> This rule emphatically dictates that the <strong>immediately preceding (most recent) transaction</strong> for a given <span class="highlight">VIN</span> must be of <span class="highlight">PURCHASE</span> type. No other transaction type can exist between the <span class="highlight">Purchase</span> and the <span class="highlight">Deed Of Sale</span> for the <span class="highlight">Deed Of Sale</span> to be valid. This ensures a direct, unbroken chain from acquisition to legal ownership transfer.</li>
+                </ul>
+            </li>
+            <li><strong>Associated Role (<span class="highlight">REFERENCE</span> column):</strong> <span class="highlight">vw_NOTARY</span>
+                <ul>
+                    <li><strong>Officer Selection:</strong> A Notary Public's <span class="highlight">OFFICER_ID</span> must geographically match the <span class="highlight">PINOY_NATIONAL_ID</span> of the vehicle's owner, and their <span class="highlight">DT_ACTIVATION</span> must be on or before the <span class="highlight">Deed Of Sale</span> transaction date.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Phase 3: Pre-Registration Clearances - <span class="highlight">CLEARANCE</span> & <span class="highlight">INSURANCE</span> (Parallel Paths)</h3>
+        <ul>
+            <li><strong>Role in Hierarchy:</strong> These are parallel, essential steps that precede <span class="highlight">Registration</span>. They can occur in any order after a <span class="highlight">Deed Of Sale</span> or even follow each other.</li>
+            <li><strong>Rules (Crucial Clarification):</strong>
+                <ul>
+                    <li>"You cannot have <span class="highlight">CLEARANCE</span> unless the <strong>last</strong> was <span class="highlight">DEED OF SALE</span> OR <span class="highlight">INSURANCE</span>."</li>
+                    <li>"You cannot have <span class="highlight">INSURANCE</span> unless the <strong>last</strong> was <span class="highlight">DEED OF SALE</span> OR <span class="highlight">CLEARANCE</span>."</li>
+                    <li><strong>Why "Last Transaction" (Nuance):</strong> Here, "last" still refers to the <strong>immediate predecessor</strong>. However, due to the parallel nature, a <span class="highlight">Clearance</span> can follow either a <span class="highlight">Deed Of Sale</span> or an <span class="highlight">Insurance</span> (if the <span class="highlight">Insurance</span> itself correctly followed a <span class="highlight">Deed Of Sale</span>). This allows for flexible sequences like <span class="highlight">Deed Of Sale</span> &rarr; <span class="highlight">Clearance</span> &rarr; <span class="highlight">Insurance</span> or <span class="highlight">Deed Of Sale</span> &rarr; <span class="highlight">Insurance</span> &rarr; <span class="highlight">Clearance</span>, validating the path towards <span class="highlight">Registration</span>.</li>
+                </ul>
+            </li>
+            <li><strong>Associated Roles (<span class="highlight">REFERENCE</span> column):</strong>
+                <ul>
+                    <li><strong>For <span class="highlight">CLEARANCE</span>:</strong> <span class="highlight">vw_CLEARANCE</span>
+                        <ul>
+                            <li><strong>Officer Selection:</strong> A Clearance Officer's <span class="highlight">OFFICER_ID</span> must geographically match the owner's <span class="highlight">PINOY_NATIONAL_ID</span>, and their <span class="highlight">DT_ACTIVATION</span> must be on or before the <span class="highlight">Clearance</span> transaction date.</li>
+                        </ul>
+                    </li>
+                    <li><strong>For <span class="highlight">INSURANCE</span>:</strong> <span class="highlight">vw_INSURANCE</span>
+                        <ul>
+                            <li><strong>Agent Selection:</strong> An Insurance Agent's <span class="highlight">OFFICER_ID</span> must geographically match the owner's <span class="highlight">PINOY_NATIONAL_ID</span>, and their <span class="highlight">DT_ACTIVATION</span> must be on or before the <span class="highlight">Insurance</span> transaction date.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Phase 4: Final Legalization - <span class="highlight">REGISTRATION</span></h3>
+        <ul>
+            <li><strong>Role in Hierarchy:</strong> The culmination of the vehicle's initial legal process, making it fully road-legal under the current owner.</li>
+            <li><strong>Rule:</strong> "You cannot have <span class="highlight">REGISTRATION</span> unless the <strong>last 2</strong> were <span class="highlight">CLEARANCE</span> AND <span class="highlight">INSURANCE</span>."
+                <ul>
+                    <li><strong>Why "Last 2 Transactions":</strong> This is the most stringent rule. It requires that the two most recent transactions for a given <span class="highlight">VIN</span> (meaning <span class="highlight">rn=1</span> and <span class="highlight">rn=2</span> in a chronologically descending list) must consist of <strong>both</strong> a <span class="highlight">Clearance</span> and an <span class="highlight">Insurance</span> transaction. Their specific order within these two positions does not matter, only their presence as the two immediate predecessors. This ensures both prerequisites are met before final registration.</li>
+                </ul>
+            </li>
+            <li><strong>Associated Role (<span class="highlight">REFERENCE</span> column):</strong> <span class="highlight">vw_REGISTRATION</span>
+                <ul>
+                    <li><strong>Officer Selection:</strong> A Registration Officer's <span class="highlight">OFFICER_ID</span> must geographically match the owner's <span class="highlight">PINOY_NATIONAL_ID</span>, and their <span class="highlight">DT_ACTIVATION</span> must be on or before the <span class="highlight">Registration</span> transaction date.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <p>This meticulous, step-by-step approach, consistently focusing on the latest relevant transactions and validating against your precise rules, allowed us to build a <span class="highlight">VEHICLES.TRANSACTIONS</span> table that is a true, clean, and hierarchical representation of each vehicle's journey through its various ownership stages. This robust foundation is what makes views like <span class="highlight">vw_VehicleCurrentStatus</span> reliable and highly valuable.</p>
+    </div>
+</body>
+</html>

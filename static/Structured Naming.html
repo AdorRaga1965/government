@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structured Folder Naming and Architectural Considerations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.8;
+            margin: 30px;
+            padding: 30px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            color: #222;
+            background-color: #ddd;
+            padding: 10px;
+            border-left: 5px solid #007acc;
+        }
+        h2 {
+            color: #007acc;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #004466;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #bbb;
+        }
+        th {
+            background-color: #007acc;
+            color: white;
+            padding: 12px;
+        }
+        td {
+            padding: 10px;
+        }
+        code {
+            display: block;
+            background-color: #222;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Structured Folder Naming and Architectural Considerations</h1>
+
+    <h2>1. Introduction</h2>
+    <p>Effective software projects rely on <strong>intuitive and scalable directory structures</strong>. As web applications grow in complexity,
+       a structured approach ensures that dependencies remain clear, concerns are separated, and modular design is maintained.</p>
+
+    <p>This paper introduces a <strong>prefix-based naming convention</strong> for categorizing **SvelteKit** components, helping developers
+       quickly associate folder names with their respective functions.</p>
+
+    <h3>Goals of This Architecture:</h3>
+    <ul>
+        <li>Ensure <strong>clear separation of concerns</strong> between APIs, components, and metadata.</li>
+        <li>Use <strong>prefix-based naming</strong> to avoid case sensitivity conflicts across OS environments.</li>
+        <li>Enhance <strong>scalability and maintainability</strong> in larger projects.</li>
+        <li>Implement **security measures** to restrict internal APIs while keeping public endpoints accessible.</li>
+    </ul>
+
+    <h2>2. Folder Structure and Naming Convention</h2>
+    <h3>Essential Directories</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Folder Name</th>
+                <th>Function</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>lib-api/</code></td>
+                <td>Private application-facing APIs (restricted access)</td>
+                <td>/src/routes/private-api/</td>
+            </tr>
+            <tr>
+                <td><code>lib-plumber/</code></td>
+                <td>Data streamers for datasource connections</td>
+                <td>/src/lib/</td>
+            </tr>
+            <tr>
+                <td><code>lib-dummy/</code></td>
+                <td>Reusable UI components used by smart containers</td>
+                <td>/src/lib/</td>
+            </tr>
+            <tr>
+                <td><code>lib-smart/</code></td>
+                <td>Host containers managing UI logic</td>
+                <td>/src/lib/</td>
+            </tr>
+            <tr>
+                <td><code>lib-meta/</code></td>
+                <td>Metadata definitions</td>
+                <td>/src/lib/</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Routing and API Accessibility Considerations</h2>
+    <h3>Restricting Internal API Access</h3>
+    <p>To protect the private APIs under <code>/src/routes/private-api/</code>, we implement authentication filtering in <code>hooks.server.js</code>.</p>
+
+    <code>
+import type { Handle } from '@sveltejs/kit';
+
+export const handle: Handle = async ({ event, resolve }) => {
+    if (event.url.pathname.startsWith('/private-api')) {
+        const authHeader = event.request.headers.get('x-internal-api-key');
+        if (!authHeader || authHeader !== "EXPECTED_SECRET") {
+            return new Response('Forbidden', { status: 403 });
+        }
+    }
+    return resolve(event);
+};
+    </code>
+
+    <h3>Public API Accessibility</h3>
+    <p>Endpoints in <code>/src/api/</code> remain open to external consumers unless additional authentication measures are introduced.</p>
+
+    <h2>4. Benefits and Scalability Considerations</h2>
+    <h3>Why This Matters?</h3>
+    <ul>
+        <li><strong>Maintainability</strong>: Prefix-based naming improves folder recognition and clarity.</li>
+        <li><strong>Scalability</strong>: Organizing directories efficiently enables easy project expansion.</li>
+        <li><strong>Security</strong>: Internal APIs are properly restricted from public exposure.</li>
+        <li><strong>Logical Component Hierarchy</strong>: Smart/dummy separation ensures modular UI management.</li>
+    </ul>
+
+    <h2>5. Conclusion</h2>
+    <p>The proposed folder-naming conventions establish a <strong>structured and scalable foundation</strong> for web applications.</p>
+
+</body>
+</html>

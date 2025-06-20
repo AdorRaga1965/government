@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filipinos Population Data</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to the top */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            width: 100%;
+            max-width: 1400px; /* Adjusted for more columns */
+            box-sizing: border-box;
+            margin-top: 20px;
+        }
+        th {
+            cursor: pointer;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            white-space: nowrap; /* Prevent column headers from wrapping */
+        }
+        td {
+            padding: 12px 16px;
+            border-top: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+        th.active {
+            color: #1f2937;
+        }
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .search-filter-section {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 16px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        .search-filter-item {
+            flex: 1; /* Allow items to grow/shrink */
+            min-width: 200px; /* Minimum width for inputs */
+        }
+        @media (max-width: 1024px) {
+            .search-filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-filter-item {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Filipinos Population Data</h1>
+
+        <div class="search-filter-section">
+            <div class="search-filter-item">
+                <input type="text" id="searchInput" placeholder="Enter search term..."
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="search-filter-item">
+                <select id="typeFilter"
+                        class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Filter by Type</option>
+                    <option value="fullname">Full Name</option>
+                    <option value="national_id">National ID</option>
+                    <option value="birth_year">Birth Year</option>
+                    <option value="birth_month">Birth Month</option>
+                    <option value="barrio">Barrio</option>
+                    <option value="city">City</option>
+                    <option value="province">Province</option>
+                    <option value="region">Region</option>
+                </select>
+            </div>
+            <div class="search-filter-item">
+                <button id="resetFiltersButton"
+                        class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                    Reset Filters
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg shadow-inner">
+            <table class="min-w-full bg-white border-collapse">
+                <thead class="bg-gray-100 sticky top-0">
+                    <tr>
+                        <th id="sort-person_id" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">ID</th>
+                        <th id="sort-fullname" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                        <th id="sort-national_id" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">National ID</th>
+                        <th id="sort-gender" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
+                        <th id="sort-birth_date" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
+                        <th id="sort-birth_year" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Year</th>
+                        <th id="sort-birth_month" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Month</th>
+                        <th id="sort-barrio_name" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barrio</th>
+                        <th id="sort-city_name" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                        <th id="sort-province_name" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Province</th>
+                        <th id="sort-region_name" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Region</th>
+                    </tr>
+                </thead>
+                <tbody id="filipinosTableBody" class="divide-y divide-gray-200">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-between items-center mt-6">
+            <button id="prevPage" class="pagination-button bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                Previous
+            </button>
+            <span id="pageInfo" class="text-gray-700 font-medium">Page 1 of 1</span>
+            <button id="nextPage" class="pagination-button bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                Next
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Mock data that simulates the output of filipino.FN_Filipinos
+        // In a real application, you would fetch this data from your backend
+        // that calls the PostgreSQL function.
+        const mockFilipinosData = [
+            { person_id: 8461249, fullname: "Ella|Takahashi|Castro", national_id: "1001805005-20090210-3875", gender: "F", birth_date: "2009-02-10", birth_year: 2009, birth_month: 2, barrio_name: "Barangay San Jose", city_name: "Quezon City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461250, fullname: "Valentina|Winston|Prescott", national_id: "1001803005-19800722-3081", gender: "F", birth_date: "1980-07-22", birth_year: 1980, birth_month: 7, barrio_name: "Barangay Maligaya", city_name: "Pasig City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461251, fullname: "Manuel|Garcia|Reynolds", national_id: "0301423022-20200728-3646", gender: "M", birth_date: "2020-07-28", birth_year: 2020, birth_month: 7, barrio_name: "Barangay Pag-asa", city_name: "Mandaluyong City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461252, fullname: "Allison|Ferguson|Kinoshita", national_id: "1204704028-19970719-3678", gender: "F", birth_date: "1997-07-19", birth_year: 1997, birth_month: 7, barrio_name: "Barangay Masinag", city_name: "Antipolo City", province_name: "Rizal", region_name: "CALABARZON" },
+            { person_id: 8461253, fullname: "Lawrence|Abe|Rodriguez", national_id: "1804503010-19561014-5023", gender: "M", birth_date: "1956-10-14", birth_year: 1956, birth_month: 10, barrio_name: "Barangay Manggahan", city_name: "Pasig City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461254, fullname: "Fiona|Franklin|Kitamura", national_id: "0305403009-20110723-7127", gender: "F", birth_date: "2011-07-23", birth_year: 2011, birth_month: 7, barrio_name: "Barangay Pinagbuhatan", city_name: "Pasig City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461255, fullname: "Naomi||Sterling", national_id: "1900704011-19971230-6518", gender: "F", birth_date: "1997-12-30", birth_year: 1997, birth_month: 12, barrio_name: "Barangay San Isidro", city_name: "Makati City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461256, fullname: "Nelson|Yee|Rodriguez", national_id: "0305411025-20100503-8658", gender: "M", birth_date: "2010-05-03", birth_year: 2010, birth_month: 5, barrio_name: "Barangay Commonwealth", city_name: "Quezon City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461257, fullname: "Erica|Olivera|Yee", national_id: "0806406015-20170111-1912", gender: "F", birth_date: "2017-01-11", birth_year: 2017, birth_month: 1, barrio_name: "Barangay Holy Spirit", city_name: "Quezon City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461258, fullname: "Ivy|Hashimoto|Tejada", national_id: "0603028057-20010116-1142", gender: "F", birth_date: "2001-01-16", birth_year: 2001, birth_month: 1, barrio_name: "Barangay Loyola Heights", city_name: "Quezon City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461259, fullname: "Sophia|Lim|Cruz", national_id: "0501234567-19950515-1234", gender: "F", birth_date: "1995-05-15", birth_year: 1995, birth_month: 5, barrio_name: "Barangay Poblacion", city_name: "Cebu City", province_name: "Cebu", region_name: "Central Visayas" },
+            { person_id: 8461260, fullname: "Daniel|Reyes|Santos", national_id: "0109876543-19881120-5678", gender: "M", birth_date: "1988-11-20", birth_year: 1988, birth_month: 11, barrio_name: "Barangay Sto. Nino", city_name: "Davao City", province_name: "Davao del Sur", region_name: "Davao Region" },
+            { person_id: 8461261, fullname: "Maria|Gonzales|Diaz", national_id: "0700100200-20000101-9012", gender: "F", birth_date: "2000-01-01", birth_year: 2000, birth_month: 1, barrio_name: "Barangay San Roque", city_name: "Baguio City", province_name: "Benguet", region_name: "Cordillera Administrative Region" },
+            { person_id: 8461262, fullname: "Juan|Dela Cruz|Mercado", national_id: "0904567890-19750303-3456", gender: "M", birth_date: "1975-03-03", birth_year: 1975, birth_month: 3, barrio_name: "Barangay Centro", city_name: "Iloilo City", province_name: "Iloilo", region_name: "Western Visayas" },
+            { person_id: 8461263, fullname: "Victoria|Sy|Tan", national_id: "0203040506-20150909-6789", gender: "F", birth_date: "2015-09-09", birth_year: 2015, birth_month: 9, barrio_name: "Barangay Kapitolyo", city_name: "Pasig City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461264, fullname: "Carlo|Villanueva|Ramos", national_id: "1105060708-19991212-0011", gender: "M", birth_date: "1999-12-12", birth_year: 1999, birth_month: 12, barrio_name: "Barangay Tagapo", city_name: "Santa Rosa", province_name: "Laguna", region_name: "CALABARZON" },
+            { person_id: 8461265, fullname: "Isabelle|Cruz|Lim", national_id: "1301020304-19820404-2233", gender: "F", birth_date: "1982-04-04", birth_year: 1982, birth_month: 4, barrio_name: "Barangay Salawag", city_name: "Dasmariñas City", province_name: "Cavite", region_name: "CALABARZON" },
+            { person_id: 8461266, fullname: "Gabriel|Santos|Torres", national_id: "1406070809-20050606-4455", gender: "M", birth_date: "2005-06-06", birth_year: 2005, birth_month: 6, barrio_name: "Barangay Balibago", city_name: "Angeles City", province_name: "Pampanga", region_name: "Central Luzon" },
+            { person_id: 8461267, fullname: "Chloe|Garcia|Reyes", national_id: "1508090102-19900808-7788", gender: "F", birth_date: "1990-08-08", birth_year: 1990, birth_month: 8, barrio_name: "Barangay Calzada", city_name: "Taguig City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461268, fullname: "Miguel|Diaz|Fernando", national_id: "1602040608-20101010-9900", gender: "M", birth_date: "2010-10-10", birth_year: 2010, birth_month: 10, barrio_name: "Barangay Ususan", city_name: "Taguig City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461269, fullname: "Andrea|Uy|Chua", national_id: "1703050709-19700101-1122", gender: "F", birth_date: "1970-01-01", birth_year: 1970, birth_month: 1, barrio_name: "Barangay San Juan", city_name: "San Juan City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461270, fullname: "Christian|Lim|Cruz", national_id: "1804060810-19980303-3344", gender: "M", birth_date: "1998-03-03", birth_year: 1998, birth_month: 3, barrio_name: "Barangay Addition Hills", city_name: "Mandaluyong City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461271, fullname: "Samantha|Torres|Ramos", national_id: "1905070911-20030505-5566", gender: "F", birth_date: "2003-05-05", birth_year: 2003, birth_month: 5, barrio_name: "Barangay Pembo", city_name: "Makati City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461272, fullname: "Joshua|Medina|Aquino", national_id: "2001030507-19650707-7788", gender: "M", birth_date: "1965-07-07", birth_year: 1965, birth_month: 7, barrio_name: "Barangay San Antonio", city_name: "Parañaque City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461273, fullname: "Isabella|Lopez|Santos", national_id: "2102040608-20180909-9900", gender: "F", birth_date: "2018-09-09", birth_year: 2018, birth_month: 9, barrio_name: "Barangay Pio del Pilar", city_name: "Makati City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461274, fullname: "Nathan|Castro|Garcia", national_id: "2203050709-19921111-1122", gender: "M", birth_date: "1992-11-11", birth_year: 1992, birth_month: 11, barrio_name: "Barangay San Juan", city_name: "Pasay City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461275, fullname: "Grace|Hernandez|Cruz", national_id: "2304060810-19851212-3344", gender: "F", birth_date: "1985-12-12", birth_year: 1985, birth_month: 12, barrio_name: "Barangay Sto. Rosario", city_name: "Pateros", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461276, fullname: "Benjamin|Reyes|Aquino", national_id: "2405070911-20070202-5566", gender: "M", birth_date: "2007-02-02", birth_year: 2007, birth_month: 2, barrio_name: "Barangay Poblacion", city_name: "Malabon City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461277, fullname: "Lily|Gonzales|Santos", national_id: "2506081012-19780404-7788", gender: "F", birth_date: "1978-04-04", birth_year: 1978, birth_month: 4, barrio_name: "Barangay Longos", city_name: "Malabon City", province_name: "Metro Manila", region_name: "National Capital Region" },
+            { person_id: 8461278, fullname: "Lucas|Diaz|Lim", national_id: "2601020304-20120606-9900", gender: "M", birth_date: "2012-06-06", birth_year: 2012, birth_month: 6, barrio_name: "Barangay Hulo", city_name: "Mandaluyong City", province_name: "Metro Manila", region_name: "National Capital Region" }
+        ];
+
+        let allFilipinos = [];
+        let filteredFilipinos = [];
+        let currentPage = 1;
+        const itemsPerPage = 10; // Adjusted for readability of mock data
+
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc'; // 'asc' or 'desc'
+
+        // DOM elements
+        const filipinosTableBody = document.getElementById('filipinosTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const typeFilter = document.getElementById('typeFilter');
+        const prevPageButton = document.getElementById('prevPage');
+        const nextPageButton = document.getElementById('nextPage');
+        const pageInfoSpan = document.getElementById('pageInfo');
+        const resetFiltersButton = document.getElementById('resetFiltersButton');
+
+        // Column headers for sorting
+        const columnMap = {
+            'sort-person_id': 'person_id',
+            'sort-fullname': 'fullname',
+            'sort-national_id': 'national_id',
+            'sort-gender': 'gender',
+            'sort-birth_date': 'birth_date',
+            'sort-birth_year': 'birth_year',
+            'sort-birth_month': 'birth_month',
+            'sort-barrio_name': 'barrio_name',
+            'sort-city_name': 'city_name',
+            'sort-province_name': 'province_name',
+            'sort-region_name': 'region_name'
+        };
+
+        // Function to fetch data (mocked)
+        async function fetchFilipinosData() {
+            // In a real application, you would make an API call here,
+            // e.g., using `fetch` to your backend that executes
+            // filipino.FN_Filipinos(search, type);
+            // Example:
+            // const response = await fetch('/api/filipinos', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ search: searchInput.value, type: typeFilter.value })
+            // });
+            // const data = await response.json();
+            // return data;
+
+            // For this demonstration, we use mock data.
+            // Apply filtering here to simulate the function's WHERE clause
+            let data = [...mockFilipinosData]; // Start with a copy of all mock data
+
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const filterType = typeFilter.value.toLowerCase();
+
+            if (searchTerm !== '') {
+                data = data.filter(person => {
+                    let valueToSearch = '';
+                    switch (filterType) {
+                        case 'fullname':
+                            valueToSearch = person.fullname;
+                            break;
+                        case 'national_id':
+                            valueToSearch = person.national_id;
+                            break;
+                        case 'birth_year':
+                            valueToSearch = String(person.birth_year);
+                            break;
+                        case 'birth_month':
+                            valueToSearch = String(person.birth_month);
+                            break;
+                        case 'barrio':
+                            valueToSearch = person.barrio_name;
+                            break;
+                        case 'city':
+                            valueToSearch = person.city_name;
+                            break;
+                        case 'province':
+                            valueToSearch = person.province_name;
+                            break;
+                        case 'region':
+                            valueToSearch = person.region_name;
+                            break;
+                        default:
+                            // If no specific type selected, search all relevant text columns
+                            return Object.values(person).some(val =>
+                                String(val).toLowerCase().includes(searchTerm)
+                            );
+                    }
+                    return String(valueToSearch).toLowerCase().includes(searchTerm);
+                });
+            }
+            return data;
+        }
+
+
+        // Function to render the table rows
+        function renderTable() {
+            filipinosTableBody.innerHTML = ''; // Clear existing rows
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = filteredFilipinos.slice(startIndex, endIndex);
+
+            if (paginatedData.length === 0) {
+                const row = filipinosTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = Object.keys(columnMap).length; // Span across all columns
+                cell.textContent = "No records found.";
+                cell.className = "text-center py-4 text-gray-500";
+                prevPageButton.disabled = true;
+                nextPageButton.disabled = true;
+                pageInfoSpan.textContent = 'Page 0 of 0';
+                return;
+            }
+
+            paginatedData.forEach(person => {
+                const row = filipinosTableBody.insertRow();
+                row.className = 'hover:bg-gray-50';
+                row.insertCell().textContent = person.person_id;
+                row.insertCell().textContent = person.fullname;
+                row.insertCell().textContent = person.national_id;
+                row.insertCell().textContent = person.gender;
+                row.insertCell().textContent = person.birth_date;
+                row.insertCell().textContent = person.birth_year;
+                row.insertCell().textContent = person.birth_month;
+                row.insertCell().textContent = person.barrio_name;
+                row.insertCell().textContent = person.city_name;
+                row.insertCell().textContent = person.province_name;
+                row.insertCell().textContent = person.region_name;
+            });
+
+            updatePaginationControls();
+        }
+
+        // Function to update pagination buttons and page info
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(filteredFilipinos.length / itemsPerPage);
+            pageInfoSpan.textContent = `Page ${currentPage} of ${totalPages}`;
+            prevPageButton.disabled = currentPage === 1;
+            nextPageButton.disabled = currentPage === totalPages || filteredFilipinos.length === 0;
+        }
+
+        // Function to apply filters and search
+        async function applyFiltersAndSearch() {
+            allFilipinos = await fetchFilipinosData(); // Fetch data based on current search/type
+            filteredFilipinos = [...allFilipinos]; // Reset filtered data with new fetched data
+
+            // Re-apply sort after filtering
+            if (currentSortColumn) {
+                sortData(currentSortColumn, currentSortDirection, false); // Don't toggle direction
+            } else {
+                renderTable(); // Just render if no sort applied
+            }
+
+            currentPage = 1; // Reset to first page after filter/search
+            renderTable();
+        }
+
+        // Function to sort data
+        function sortData(column, direction, toggleDirection = true) {
+            // Remove active classes from all headers
+            document.querySelectorAll('th').forEach(th => th.classList.remove('active'));
+
+            currentSortColumn = column;
+            if (toggleDirection) {
+                currentSortDirection = (direction === 'asc' ? 'desc' : 'asc');
+            } else {
+                currentSortDirection = direction;
+            }
+
+            // Add active class to the sorted column header
+            const headerElement = document.getElementById(`sort-${column}`);
+            if (headerElement) {
+                headerElement.classList.add('active');
+            }
+
+            filteredFilipinos.sort((a, b) => {
+                let valA = a[column];
+                let valB = b[column];
+
+                // Handle null/undefined values by pushing them to the end
+                if (valA === null || valA === undefined) return currentSortDirection === 'asc' ? 1 : -1;
+                if (valB === null || valB === undefined) return currentSortDirection === 'asc' ? -1 : 1;
+
+                // Numeric comparison for numeric columns
+                if (typeof valA === 'number' && typeof valB === 'number') {
+                    return currentSortDirection === 'asc' ? valA - valB : valB - valA;
+                }
+                // Date comparison for birth_date
+                if (column === 'birth_date') {
+                    const dateA = new Date(valA);
+                    const dateB = new Date(valB);
+                    return currentSortDirection === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+                }
+                // String comparison for all other columns (case-insensitive)
+                const strA = String(valA).toLowerCase();
+                const strB = String(valB).toLowerCase();
+
+                if (strA < strB) {
+                    return currentSortDirection === 'asc' ? -1 : 1;
+                }
+                if (strA > strB) {
+                    return currentSortDirection === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+
+            currentPage = 1; // Reset to first page after sort
+            renderTable();
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', applyFiltersAndSearch);
+        typeFilter.addEventListener('change', applyFiltersAndSearch);
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredFilipinos.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        });
+
+        // Add event listeners for sorting on table headers
+        const sortHeaders = document.querySelectorAll('th[id^="sort-"]');
+        sortHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const column = columnMap[header.id];
+                const direction = currentSortDirection; // Use current direction for toggling
+                sortData(column, direction);
+            });
+        });
+
+        resetFiltersButton.addEventListener('click', async () => {
+            searchInput.value = '';
+            typeFilter.value = '';
+            currentSortColumn = null;
+            currentSortDirection = 'asc';
+            // Remove active classes from all headers
+            document.querySelectorAll('th').forEach(th => th.classList.remove('active'));
+            await applyFiltersAndSearch(); // Re-fetch and re-render with reset filters
+        });
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initial fetch of all data (simulated without filters)
+            allFilipinos = await fetchFilipinosData();
+            filteredFilipinos = [...allFilipinos]; // Start with all data
+            renderTable();
+        });
+
+    </script>
+</body>
+</html>
