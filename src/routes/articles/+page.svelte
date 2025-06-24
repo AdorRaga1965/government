@@ -23,12 +23,13 @@
 	<button class="but-warning"  onclick={() => assignSrc("National ID")}>National ID</button>
 <button class="but-warning"  onclick={() => assignSrc("Vehicle Search")}>Vehicle Search</button>
 <button class="but-warning"  onclick={() => assignSrc("Filipino Search")}>Filipino Search</button>
-<button class="but-warning"  onclick={() => assignSrc("Vehicles API")}>Vehicles API</button>
+<button class="but-warning"  onclick={() => assignSrc("ContVehicles API")}>Vehicles API</button>
 <button class="but-warning"  onclick={() => assignSrc("Vehicle AI Feedback")}>Vehicle AI Feedback</button>
 
 <button class="but-warning"  onclick={() => assignSrc("Passwordless")}>National ID Isn't the Problem</button>
 <button class="but-warning"  onclick={() => assignSrc("Mastering the lto Transactions")}>Mastering the LTO Transactions</button>
 <button class="but-warning"  onclick={() => assignSrc("Database Design Session 6-11-2025")}>DB Design Session</button>
+<button class="but-warning"  onclick={() => assignSrc("Brainwashing")}>Brainwashing</button>
 <button class="but-warning"  onclick={() => assignSrc("splash")}>Splash</button>
 
 <!--<button class="but-warning"  on:click={() => assignSrc("Cheat Sheet") }>Cheat Sheet</button>-->

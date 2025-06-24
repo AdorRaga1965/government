@@ -83,7 +83,7 @@ color: #28a745;
 <div class="container">
 <h1>Corrected Debrief & Architect's Sanity Check</h1>
 <h2>What Went Wrong? The True Chain of Failure</h2>
-    <p>The problem was a subtle but critical bug in the SvelteKit API proxy (`/routes/api/query/+server.ts`). The Python backend was always correct. The final client-side helper (`/lib/api.ts`) was also correct. The failure was in how the middleman was passing the message.</p>
+    <p>The problem was a subtle but critical bug in the SvelteKit API proxy (`/routes/api/query/+server.ts`). The Python backend was always correct. The final client-side helper (`/lib/Svc_Api.ts`) was also correct. The failure was in how the middleman was passing the message.</p>
     <ul>
         <li><strong>The Symptom:</strong> FastAPI returned a <code>422 Unprocessable Entity</code> error.</li>
         <li><strong>The Incorrect Diagnosis:</strong> My initial analysis focused on `307 Redirects` and client-side caching. This was a red herring. The logs proved the client was sending a perfect request.</li>

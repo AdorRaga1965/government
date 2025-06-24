@@ -2,7 +2,7 @@
   import Input from "$lib/UI/Input.svelte";
   import Dropdown from "$lib/UI/Dropdown.svelte";
   import NameBirth from "$lib/components/NameBirth.svelte";
-  import { graphine } from '$lib/api';
+  import { graphine } from '$lib/services/Svc_Api';
 
   const inputElements = ["region", "province", "city", "barrio"];
 

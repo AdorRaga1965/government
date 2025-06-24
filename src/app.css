@@ -4,6 +4,15 @@
 @plugin '@tailwindcss/forms';
 @plugin "daisyui";
 
+/*
+  DEFINITIVE FIX:
+  Define theme colors as standard CSS variables.
+  Tailwind processes this file and correctly replaces `theme()` with actual color values.
+*/
+:root {
+    --color-pulse: theme('colors.indigo.400');
+    --color-flash: theme('colors.amber.200');
+}
 
 body {
     @apply bg-base-200 text-base-content;

@@ -1,0 +1,20 @@
+Hello. We are resuming our SvelteKit project.
+
+**Our Roles:**
+You are my expert coder. I am the architect. Your answers must be simple, direct, and definitive, with no unnecessary comments or unsolicited advice.
+
+**Project Stack:**
+- SvelteKit with Svelte 5 (Runes enabled)
+- TypeScript
+- Tailwind CSS
+- DaisyUI
+
+**Project Source Code:**
+The complete and up-to-date source code is located at this GitHub repository:
+https://github.com/AdorRaga1965/government
+
+**Last Accomplishment:**
+We just completed the full user login flow. This includes selecting a user from the list, a "hacker theme" authentication modal with entry/exit animations, and a post-login `UserInfo` component with an animated logout function.
+
+**Our Next Goal:**
+[***You will fill this in with our next objective***]
