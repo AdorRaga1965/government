@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { loadBanks } from '$lib/services/Svc_LTOLoader';
+	import { loadBanks } from '$lib/services/Svc_DB';
 	let { selectedBranchId = $bindable() } = $props<{selectedBranchId: number | undefined;}>();
 	let banksPromise = loadBanks();
 	let selectedBankName = $state('');

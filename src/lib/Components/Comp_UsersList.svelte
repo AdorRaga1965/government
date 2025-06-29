@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { User } from '$lib/types';
-  import Comp_Avatar from '$lib/components/Comp_Avatar.svelte';
+  import Comp_Avatar from '$lib/Components/Comp_Avatar.svelte';
 
   let { users, onselect } = $props<{
     users: User[];

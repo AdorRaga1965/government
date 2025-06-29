@@ -3,8 +3,8 @@
   import { tweened } from 'svelte/motion';
   import { scale, fly } from 'svelte/transition';
   import type { User } from '$lib/types';
-  import Comp_Icons from '$lib/components/Comp_Icons.svelte';
-  import Comp_Avatar from '$lib/components/Comp_Avatar.svelte';
+  import Comp_Icons from '$lib/Components/Comp_Icons.svelte';
+  import Comp_Avatar from '$lib/Components/Comp_Avatar.svelte';
 
   let { user, startRect, isExiting, onsuccess, onclose, onexitcomplete } = $props<{
     user: User;

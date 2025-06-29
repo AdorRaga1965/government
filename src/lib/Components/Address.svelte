@@ -1,15 +1,9 @@
 <script lang="ts">
   import Input from "$lib/UI/Input.svelte";
   import Dropdown from "$lib/UI/Dropdown.svelte";
-  import NameBirth from "$lib/components/NameBirth.svelte";
-  import { graphine } from '$lib/services/Svc_Api';
-
+  import NameBirth from "$lib/Components/NameBirth.svelte";
+  import { graphine } from '$lib/services/Svc_DB';
   const inputElements = ["region", "province", "city", "barrio"];
-
-  // let { selectedRegion="", selectedProvince="", selectedCity="", selectedBarrio="", selectedStreet="" } = $props<{
-  //   selectedRegion:string, selectedProvince:string, selectedCity:string,
-  //   selectedBarrio:string, selectedStreet:string }>();
-
   let {
     selectedRegion = $bindable(''),
     selectedProvince = $bindable(''),
@@ -23,10 +17,8 @@
           data = $bindable([]),
   } = $props();
 
-
   let barrio_code = "";
   let lastValue = "";
-
   let selectedDataMap: Record<string, string> = {
     region: "",
     province: "",
@@ -35,20 +27,13 @@
     street: ""
   };
 
-  // Either reactive statement:
   let  showDD = $derived(!showStreetAddress && data.length > 0);
-
-// OR with $derived (if data & showStreetAddress were stores):
-// showDD = $derived([showStreetAddress, data], ([$showStreetAddress, $data]) => !$showStreetAddress && $data.length > 0);
-
   $effect(() => {
   if (selectedPlace !== null) {
     handlePlace();
   }});
 
   $effect(() => {
-  // We only want this effect to run when `activeKeyboardValue` changes.
-  // The 'if' condition remains the same inside the effect.
   if (activeKeyboardValue.length >= 2 && lastValue !== activeKeyboardValue) {
     // The logic inside is identical.
     const predicate = {

@@ -1,4 +1,4 @@
-import type { ColumnDef } from '$lib/components/types';
+import type { ColumnDef } from '$lib/Components/types';
 import type { FilipinoPerson } from '$lib/types';
 
 // The configuration is exported as a single object for easy import.

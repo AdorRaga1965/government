@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { enhance } from '$app/forms';
 	import { slide } from 'svelte/transition';
-	import Comp_Icons from '$lib/components/Comp_Icons.svelte';
+	import Comp_Icons from '$lib/Components/Comp_Icons.svelte';
 	import type { Purchase_Record as Task } from '$lib/types';
 
 	export let tasks: Task[];

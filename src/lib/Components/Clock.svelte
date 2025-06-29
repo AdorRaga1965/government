@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { clockService } from '$lib/components/clock.service'; // Adjust path if needed
+	import { clockService } from '$lib/Components/clock.service'; // Adjust path if needed
 
 	let container: HTMLDivElement | null = $state(null);
 

@@ -3,21 +3,13 @@
 @plugin '@tailwindcss/typography';
 @plugin '@tailwindcss/forms';
 @plugin "daisyui";
-
-/*
-  DEFINITIVE FIX:
-  Define theme colors as standard CSS variables.
-  Tailwind processes this file and correctly replaces `theme()` with actual color values.
-*/
 :root {
     --color-pulse: theme('colors.indigo.400');
     --color-flash: theme('colors.amber.200');
 }
-
 body {
     @apply bg-base-200 text-base-content;
 }
-
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -31,19 +23,14 @@ body {
     font-family: 'spice';
     src: url('/fonts/BungeeSpice-Regular.ttf') format('truetype');
 }
-
 @font-face {
     font-family: 'almendra';
     src: url('/fonts/Kenney Rocket Square.ttf') format('truetype');
 }
 
-
 label {
     @apply text-white font-bold mb-2;
 }
-
-
-/* Cards */
 .card-container {
     @apply  min-h-screen bg-gradient-to-r from-blue-900 to-blue-500 text-white;
 }
@@ -51,7 +38,7 @@ label {
 .section {
     @apply shadow-lg rounded-xl p-2 max-w-[600px] hover:bg-blue-700 transition-shadow duration-300;
 }
-/* Section Titles */
+
 .section-title {
     text-shadow: 2px 2px 4px cornflowerblue;
     @apply text-4xl text-zinc-200 font-bold mb-2;
@@ -61,16 +48,10 @@ label {
     @apply flex flex-col h-full p-2 w-fit;
 }
 
-/* Text Styling */
 .text-content {
     @apply text-gray-700 mb-4 leading-relaxed;
 }
 
-/*!* Input & Focus Enhancements *!*/
-/*.input {*/
-/*    @apply p-2 border border-gray-300 rounded-md text-zinc-800 transition*/
-/*    focus:outline-6 focus:ring-4 focus:h-14 focus:ring-amber-400 focus:text-zinc-800;*/
-/*}*/
 
 .field {
     display: flex;
@@ -131,7 +112,7 @@ label {
 }
 
 .shady {
-    @apply text-shadow-lg text-rose-400 text-shadow-zinc-700;
+    @apply text-shadow-lg text-shadow-zinc-700;
 }
 
 .card {
@@ -156,7 +137,6 @@ label {
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     border-top: 5px solid #003366; /* A formal, presidential blue */
 }
-
 
 .stick {
     @apply sticky top-0 z-50 bg-white shadow-md;

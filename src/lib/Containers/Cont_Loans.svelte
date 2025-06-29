@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Comp_Banks from '$lib/components/Comp_Banks.svelte';
+  import Comp_Banks from '$lib/Components/Comp_Banks.svelte';
 
   let { selectedBranchId = $bindable() } = $props<{
    selectedBranchId: number | undefined;

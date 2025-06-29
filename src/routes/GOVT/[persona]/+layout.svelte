@@ -3,7 +3,7 @@
 <script lang="ts">
 	import '/src/app.css';
 	// Import our new global notification component.
-	import Comp_Notification from '$lib/components/Comp_Notification.svelte';
+	import Comp_Notification from '$lib/Components/Comp_Notification.svelte';
 </script>
 
 <!-- The Notification component is now part of every page. -->

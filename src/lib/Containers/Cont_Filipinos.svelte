@@ -4,8 +4,7 @@
   DeleteGenericTable component. All data-specific logic lives here.
 -->
 <script lang="ts">
-  import DeleteGenericTable from '$lib/components/DELETEGenericTable.svelte';
-  import { graphine } from '$lib/services/Svc_Api';
+  import { graphine } from '$lib/services/Svc_DB';
   import type { ColumnDef } from '@tanstack/table-core';
 
   // --- INTERFACE for our specific data ---

@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import type { User } from '$lib/types';
-  import { loadUsersByPersona } from '$lib/services/Svc_LTOLoader';
-  import Comp_UsersList from '$lib/components/Comp_UsersList.svelte';
-  import Comp_Authentication from '$lib/components/Comp_Authentication.svelte';
-  import Comp_UserInfo from '$lib/components/Comp_UserInfo.svelte';
-  import Cont_PersonaItems from '$lib/containers/Cont_PersonaItems.svelte';
-  import Cont_PurchaseItem from '$lib/containers/Cont_PurchaseItem.svelte';
-  import CompInfoModal from '$lib/components/Comp_InfoModal.svelte';
+  import { loadUsersByPersona } from '$lib/services/Svc_DB';
+  import Comp_UsersList from '$lib/Components/Comp_UsersList.svelte';
+  import Comp_Authentication from '$lib/Components/Comp_Authentication.svelte';
+  import Comp_UserInfo from '$lib/Components/Comp_UserInfo.svelte';
+  import Cont_PersonaItems from '$lib/Containers/Cont_PersonaItems.svelte';
+  import Cont_PurchaseItem from '$lib/Containers/Cont_PurchaseItem.svelte';
+  import CompInfoModal from '$lib/Components/Comp_InfoModal.svelte';
 
   let { data }: { data: PageData } = $props();
   let view: 'users' | '' = $state('users');
@@ -98,7 +98,7 @@
 
     <div class="flex-grow min-h-0 h-full card bg-base-100 items-center justify-center">
           {#if data.persona === 'purchase'}
-              <Cont_PurchaseItem />
+              <Cont_PurchaseItem currentUser={authenticatedUser}/>
           {:else}
               <Cont_PersonaItems persona={data.persona} />
           {/if}

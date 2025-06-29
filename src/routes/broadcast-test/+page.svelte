@@ -7,8 +7,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
-	import Cont_TableWizard from '$lib/containers/Cont_TableWizard.svelte';
-	import { filipinoConfig } from '$lib/configs/Conf_Filipinos';
+	import Cont_TableWizard from '$lib/Containers/Cont_TableWizard.svelte';
+	import { filipinoConfig } from '$lib/Configs/Conf_Filipinos';
 	import type { FilipinoPerson } from '$lib/types';
 
 	let { form }: { form: ActionData } = $props();

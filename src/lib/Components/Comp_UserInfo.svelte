@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { User } from '$lib/types';
   import Comp_Icons from './Comp_Icons.svelte';
-  import Comp_Avatar from '$lib/components/Comp_Avatar.svelte'; // Import the Comp_Avatar component
+  import Comp_Avatar from '$lib/Components/Comp_Avatar.svelte'; // Import the Comp_Avatar component
 
   let { user, onlogout, isLoggingOut, onlogoutcomplete } = $props<{
     user: User;
@@ -48,14 +48,13 @@
       </div>
     </div>
     <div class="flex-grow">
-      <h3 class="text-2xl font-bold">{user.fullname.replaceAll('|', ' ')}</h3>
-      <p class="text-base-content/70">ID: {user.officer_id || 'N/A'}</p>
+      <p class="text-4xl bm-4 shady text-blue-300  font-extrabold">{user.fullname.replaceAll('|', ' ')}</p>
+<!--      <p class="text-base-content/70">ID: {user.officer_id || 'N/A'}</p>-->
       <p class="text-base-content/70"> Age: {user.age || 'N/A'} | Gender: {user.gender || 'N/A'} </p>
       <div class="text-base-content/70">Activated: {activationDate}</div>
     </div>
     <div class="ml-auto">
-      <button class="btn btn-outline btn-error" onclick={onlogout} disabled={isLoggingOut}>
-        <Comp_Icons name="logout" />
+      <button class="btn btn-error" onclick={onlogout} disabled={isLoggingOut}>
         Logout
       </button>
     </div>

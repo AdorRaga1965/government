@@ -1,4 +1,4 @@
-import type { ColumnDef } from '$lib/components/types';
+import type { ColumnDef } from '$lib/Components/types';
 import type { Vehicle } from '$lib/types'; // Assuming Vehicle type is defined in your main types.ts
 
 // The configuration is exported as a single object for easy import.
